@@ -1,0 +1,37 @@
+---
+# tasks file for maven
+- name: Is Updated?
+  become: true
+  apt:
+    update_cache: yes
+    cache_valid_time: 86400 #One day
+
+    #- name: Is Installed?
+    #apt:
+    #pkg:
+    #  - maven
+    #  - java
+    #  - git
+    #state: latest
+
+- name: install packages
+  apt: name={{item}} state=latest
+  with_items:
+     - git
+     - maven
+     - default-jre
+
+- name: Clone a repo with separate git directory
+  git:
+    repo: "{{maven_repo}}"
+    dest: /src/
+
+- name: Run maven package
+  shell: mvn package -am -T 1C
+  args:
+    chdir: /src/
+
+- name: Fetch the file from the mavenserver to master
+  run_once: yes
+  fetch: src=/src/target/hello-1.0.war dest=buffer/ flat=yes
+  when: "{{ inventory_hostname == 'mavenserver' }}"

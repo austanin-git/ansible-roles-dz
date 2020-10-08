@@ -1,0 +1,12 @@
+---
+# tasks file for common
+  - name: Is Installed?
+    apt:
+      pkg:
+      - vim
+      - ncdu
+      - default-jre
+      - links
+      - tree
+      - mc
+

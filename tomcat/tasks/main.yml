@@ -1,0 +1,25 @@
+---
+# tasks file for tomcat
+- name: Is Updated?
+  become: true
+  apt:
+    update_cache: yes
+    cache_valid_time: 86400 #One day
+
+- name: Is Installed?
+  apt:
+    pkg:
+      - tomcat9
+
+- name: Copy the file from master to tomcatserver
+  copy: src=buffer/hello-1.0.war dest=/var/lib/tomcat9/webapps/hello-1.0.war
+  when: "{{ inventory_hostname == 'tomcatserver' }}"
+
+- name: Is http allowed?
+  ufw: rule=allow port=8080 proto=tcp
+
+- name: Is 22 allowed?
+  ufw: rule=allow port=22 proto=tcp
+
+- name: Set firewall default policy
+  ufw: state=enabled policy=reject
